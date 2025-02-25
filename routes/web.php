@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\AdvisorController;
+use App\Http\Middleware\LoanMiddleware;
 
 
 Route::get('/', function () {
@@ -27,10 +28,11 @@ Route::middleware(['auth'])->group(function () {
     
     Route::patch('cash-loan-update/{client}', [AdvisorController::class, 'updateCashLoan'])->name('updateCashLoan');
     Route::patch('home-loan-update/{client}', [AdvisorController::class, 'updateHomeLoan'])->name('updateHomeLoan');
+    Route::get('reset-loans/{client}', [AdvisorController::class, 'resetLoans'])->name('resetLoans');
     
     Route::get('reports', [AdvisorController::class, 'reports'])->name('reports');
     Route::get('reports-export', [AdvisorController::class, 'reportsExport'])->name('reportsExport');
-    Route::get('reset-loans/{client}', [AdvisorController::class, 'resetLoans'])->name('resetLoans');
+
 });
 
 

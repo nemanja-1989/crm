@@ -6,14 +6,15 @@ use App\Models\CashLoan;
 use App\Models\HomeLoan;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Illuminate\Support\Facades\Auth;
 
 class ReportsExport implements FromCollection, WithMapping
 {
     public function collection()
     {
 
-        $cashLoan = CashLoan::with(['advisor', 'client'])->get();
-        $homeLoan = HomeLoan::with(['advisor', 'client'])->get();
+        $cashLoan = CashLoan::with(['advisor', 'client'])->where('user_id', Auth::user()->id)->get();
+        $homeLoan = HomeLoan::with(['advisor', 'client'])->where('user_id', Auth::user()->id)->get();
 
         return $cashLoan->concat($homeLoan)->sortByDesc('created_at');
 

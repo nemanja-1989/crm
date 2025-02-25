@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\CashLoan;
 use App\Models\HomeLoan;
+use App\Models\Client;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
@@ -59,6 +60,11 @@ class User extends Authenticatable
     public function homeLoans(): HasMany
     {
         return $this->hasMany(HomeLoan::class, 'user_id', 'id');
+    }
+
+    public function clients(): HasMany
+    {
+        return $this->hasMany(Client::class, 'user_id', 'id');
     }
 
 }

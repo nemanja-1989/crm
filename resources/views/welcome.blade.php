@@ -1,11 +1,9 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('layouts.kredium')
 
-        <title>Laravel</title>   
-    <body>
+@section('title', 'Kredium loan')
+
+@section('content')
+
         <h1>Kredium loans</h1>  
 
         <div>
@@ -13,5 +11,4 @@
                 <button>Log in</button>
             </a>
         </div>
-    </body>
-</html>
+@endsection

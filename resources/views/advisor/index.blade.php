@@ -1,14 +1,24 @@
+@extends('layouts.kredium')
 
-<div>
-    <a href="{{ route('clients') }}">View all clients</a>
-</div>
+@section('title', 'Kredium dashboard')
 
-<div>
-    <a href="{{ route('reports') }}">View report</a>
-</div>
+@section('content')
 
-<div>
-    <a href="{{ route('logout') }}">
-        <button>Logout</button>
-    </a>
-</div>
+        <h1>Dashboard</h1>  
+
+        <div>
+            <a href="{{ route('clients') }}">View all clients</a>
+        </div>
+
+        <div>
+            <a href="{{ route('reports') }}">View report</a>
+        </div>
+
+        <div>
+            <a href="{{ route('logout') }}">
+                <button>Logout</button>
+            </a>
+        </div>
+@endsection
+
+

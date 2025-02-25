@@ -5,14 +5,27 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
+use App\Http\Requests\CashLoanRequest;
+use App\Http\Requests\HomeLoanRequest;
+use App\Models\User;
 use App\Models\Client;
 use App\Models\CashLoan;
 use App\Models\HomeLoan;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ReportsExport;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use App\Repositories\ClientRepositoryInterface;
 
 class AdvisorController extends Controller
 {
+
+    private ClientRepositoryInterface $clientRepository;
+
+    public function __construct(ClientRepositoryInterface $clientRepository) {
+
+        $this->clientRepository = $clientRepository;
+    }
 
     public function index() {
 
@@ -21,17 +34,15 @@ class AdvisorController extends Controller
 
     public function clients() {
 
-        $clients = Client::get();
-
         return view('clients', [
-            'clients' => $clients        
+            'clients' => $this->clientRepository->all()        
         ]);
     }
 
     public function reports() {
 
-        $cashLoan = CashLoan::with(['advisor', 'client'])->get();
-        $homeLoan = HomeLoan::with(['advisor', 'client'])->get();
+        $cashLoan = CashLoan::with(['advisor', 'client'])->where('user_id', Auth::user()->id)->get();
+        $homeLoan = HomeLoan::with(['advisor', 'client'])->where('user_id', Auth::user()->id)->get();
 
         $reports = $cashLoan->concat($homeLoan)->sortByDesc('created_at');
 
@@ -55,39 +66,51 @@ class AdvisorController extends Controller
     }
 
     public function storeClient(StoreClientRequest $request) {
-   
-        Client::create([
+
+        $data = [
+            'user_id' => auth()->user()->id,
             'first_name' => $request->get('first_name'),
             'last_name' => $request->get('last_name'),
             'email' => $request->get('email'),
             'phone' => $request->get('phone')
-        ]);
+        ];
+   
+        $this->clientRepository->create($data);
 
         return redirect()->intended('clients');
     }
 
     public function updateClient(UpdateClientRequest $request, $client) {
         
-        Client::whereId($client)->update([
+        $data = [
+            'user_id' => auth()->user()->id,
             'first_name' => $request->get('first_name'),
             'last_name' => $request->get('last_name'),
             'email' => $request->get('email'),
             'phone' => $request->get('phone')
-        ]);
+        ];
+
+        $this->clientRepository->update($data, $client);
 
         return redirect()->intended('clients');
     }
 
     public function deleteClient($client) {
 
-        Client::whereId($client)->first()->delete();
+        $client = $this->clientRepository->find($client);
+
+        $this->advisorAuthorization($client);
+
+        $this->clientRepository->delete($client->id);
 
         return redirect()->back();
     }
 
-    public function updateCashLoan(Request $request, $client) {
+    public function updateCashLoan(CashLoanRequest $request, $client) {
 
-        $client = Client::whereId($client)->first();
+        $client = $this->clientRepository->find($client);
+
+        $this->advisorAuthorization($client);
 
         if($client->cashLoan()->exists()) {
             $client->cashLoan()->update([
@@ -104,9 +127,11 @@ class AdvisorController extends Controller
         return redirect()->intended('clients');
     }
 
-    public function updateHomeLoan(Request $request, $client) {
+    public function updateHomeLoan(HomeLoanRequest $request, $client) {
         
-        $client = Client::whereId($client)->first();
+        $client = $this->clientRepository->find($client);
+
+        $this->advisorAuthorization($client);
 
         if($client->homeLoan()->exists()) {
             $client->homeLoan()->update([
@@ -127,7 +152,10 @@ class AdvisorController extends Controller
 
     public function resetLoans($client) {
 
-        $client = Client::whereId($client)->first();
+        $client = $this->clientRepository->find($client);
+
+        $this->advisorAuthorization($client);
+
         $client->cashLoan()->delete();
         $client->homeLoan()->delete();
 
@@ -137,5 +165,14 @@ class AdvisorController extends Controller
     public function reportsExport() {
 
         return Excel::download(new ReportsExport, 'reports.csv', \Maatwebsite\Excel\Excel::CSV);
+    }
+
+    private function advisorAuthorization($client) {
+        
+        $advisor = User::whereId($client->user_id)->first();
+
+        if (! Gate::forUser($advisor)->allows('loans')) {
+            abort(403);
+        }
     }
 }

@@ -81,6 +81,10 @@ class AdvisorController extends Controller
     }
 
     public function updateClient(UpdateClientRequest $request, $client) {
+
+        $client = $this->clientRepository->find($client);
+
+        $this->advisorAuthorization($client);
         
         $data = [
             'user_id' => auth()->user()->id,
@@ -90,7 +94,7 @@ class AdvisorController extends Controller
             'phone' => $request->get('phone')
         ];
 
-        $this->clientRepository->update($data, $client);
+        $this->clientRepository->update($data, $client->id);
 
         return redirect()->intended('clients');
     }

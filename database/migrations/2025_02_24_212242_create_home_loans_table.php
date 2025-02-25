@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('client_id')->index();
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade')->onUpdate('cascade');
-            $table->double('property_value');
-            $table->double('down_payment_amount');
+            $table->double('property_value')->nullable();
+            $table->double('down_payment_amount')->nullable();
             $table->timestamps();
         });
     }

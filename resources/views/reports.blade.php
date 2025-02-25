@@ -22,7 +22,13 @@
                 <td>{{ $report->loan_amount }}</td>
             @endif
             <td>{{ $report->client->email }}</td>
-            <td>{{ $report->created_at }}</td>
+            <td>{{ $report->created_at->format('Y-m-d') }}</td>
         </tr>
     @endforeach
 </table>
+
+<div>
+    <a href="{{ route('reportsExport') }}">
+        <button>Export report</button>
+    </a>
+</div>

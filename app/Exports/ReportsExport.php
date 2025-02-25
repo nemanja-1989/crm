@@ -35,7 +35,7 @@ class ReportsExport implements FromCollection, WithMapping
             $propertType,
             $productValue,
             $report->client->email,
-            $report->created_at
+            $report->created_at->format('Y-m-d')
         ];
     }
 }

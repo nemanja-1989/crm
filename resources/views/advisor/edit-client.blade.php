@@ -16,19 +16,48 @@
     <button type="submit">Update client</button>
 </form>
 
-<h2>Cash loan</h2>
-<form method="POST" action="{{ route('updateCashLoan', $client->id) }}">
-    @csrf
-    {{ method_field('PATCH') }}
-    <input type="number" name="loan_amount" placeholder="Loan amount">
-    <button type="submit">Update Cash loan</button>
-</form>
+@if($client->cashLoan && !$client->homeLoan)
+    <h2>Cash loan</h2>
+    <form method="POST" action="{{ route('updateCashLoan', $client->id) }}">
+        @csrf
+        {{ method_field('PATCH') }}
+        <input type="number" name="loan_amount" value="{{ $client->cashLoan ? $client->cashLoan->loan_amount : '' }}" placeholder="Loan amount">
+        <button type="submit">Update Cash loan</button>
+    </form>
+@endif
 
+@if($client->homeLoan && !$client->cashLoan)
 <h2>Home loan</h2>
 <form method="POST" action="{{ route('updateHomeLoan', $client->id) }}">
     @csrf
     {{ method_field('PATCH') }}
-    <input type="number" name="property_value" placeholder="Property value">
-    <input type="number" name="down_payment_amount" placeholder="Down payment amount">
+    <input type="number" name="property_value" value="{{ $client->homeLoan ? $client->homeLoan->property_value : '' }}" placeholder="Property value">
+    <input type="number" name="down_payment_amount" value="{{ $client->homeLoan ? $client->homeLoan->down_payment_amount : '' }}" placeholder="Down payment amount">
     <button type="submit">Update Home loan</button>
 </form>
+@endif
+
+@if(!$client->cashLoan && !$client->homeLoan)
+    <h2>Cash loan</h2>
+    <form method="POST" action="{{ route('updateCashLoan', $client->id) }}">
+        @csrf
+        {{ method_field('PATCH') }}
+        <input type="number" name="loan_amount" value="{{ $client->cashLoan ? $client->cashLoan->loan_amount : '' }}" placeholder="Loan amount">
+        <button type="submit">Update Cash loan</button>
+    </form>
+
+    <h2>Home loan</h2>
+    <form method="POST" action="{{ route('updateHomeLoan', $client->id) }}">
+        @csrf
+        {{ method_field('PATCH') }}
+        <input type="number" name="property_value" value="{{ $client->homeLoan ? $client->homeLoan->property_value : '' }}" placeholder="Property value">
+        <input type="number" name="down_payment_amount" value="{{ $client->homeLoan ? $client->homeLoan->down_payment_amount : '' }}" placeholder="Down payment amount">
+        <button type="submit">Update Home loan</button>
+    </form>
+@endif
+
+<div>
+    <a href="{{ route('resetLoans', $client->id) }}">
+        <button>New contract</button>
+    </a>
+</div>

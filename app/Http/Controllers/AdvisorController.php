@@ -13,6 +13,7 @@ use App\Exports\ReportsExport;
 
 class AdvisorController extends Controller
 {
+
     public function index() {
 
         return view('advisor/index');
@@ -54,7 +55,7 @@ class AdvisorController extends Controller
     }
 
     public function storeClient(StoreClientRequest $request) {
-        
+   
         Client::create([
             'first_name' => $request->get('first_name'),
             'last_name' => $request->get('last_name'),
@@ -122,6 +123,15 @@ class AdvisorController extends Controller
         }
 
         return redirect()->intended('clients');
+    }
+
+    public function resetLoans($client) {
+
+        $client = Client::whereId($client)->first();
+        $client->cashLoan()->delete();
+        $client->homeLoan()->delete();
+
+        return redirect()->back();
     }
 
     public function reportsExport() {
